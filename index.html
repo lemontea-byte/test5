@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Room Game</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+h1{
+    margin-bottom:15px;
+}
+
+#game{
+    max-width:800px;
+    margin:auto;
+}
+
+.room{
+    background:#222;
+    border:2px solid #555;
+    border-radius:15px;
+    padding:20px;
+    margin-top:20px;
+}
+
+button{
+    padding:10px 20px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#3498db;
+    color:white;
+    font-size:16px;
+}
+
+button:hover{
+    background:#2980b9;
+}
+
+input{
+    padding:10px;
+    width:150px;
+    text-align:center;
+    font-size:18px;
+    margin-top:10px;
+}
+
+#message{
+    margin-top:15px;
+    min-height:40px;
+    color:#f1c40f;
+    font-weight:bold;
+}
+
+#inventory{
+    margin-top:15px;
+    padding:10px;
+    background:#333;
+    border-radius:10px;
+}
+
+.hidden{
+    display:none;
+}
+
+.success{
+    color:#2ecc71;
+    font-size:24px;
+}
+</style>
+</head>
+<body>
+
+<div id="game">
+
+<h1>🏠 Escape Room</h1>
+
+<div id="inventory">
+    Inventory: <span id="items">Nothing</span>
+</div>
+
+<div id="message">
+    You wake up in a mysterious house...
+</div>
+
+<!-- ROOM 1 -->
+<div id="room1" class="room">
+    <h2>Room 1 - Bedroom</h2>
+    <p>The door is locked.</p>
+
+    <button onclick="searchBed()">Search Bed</button>
+    <button onclick="searchDesk()">Search Desk</button>
+
+    <div id="lock1" class="hidden">
+        <p>Enter 3-digit code:</p>
+        <input type="text" id="code1">
+        <br>
+        <button onclick="unlockRoom1()">Unlock Door</button>
+    </div>
+</div>
+
+<!-- ROOM 2 -->
+<div id="room2" class="room hidden">
+    <h2>Room 2 - Library</h2>
+    <p>A locked cabinet stands in the corner.</p>
+
+    <button onclick="checkBooks()">Inspect Bookshelf</button>
+    <button onclick="openCabinet()">Open Cabinet</button>
+</div>
+
+<!-- ROOM 3 -->
+<div id="room3" class="room hidden">
+    <h2>Room 3 - Exit Hall</h2>
+
+    <p>The final exit door requires a key.</p>
+
+    <button onclick="useKey()">Use Key</button>
+</div>
+
+<!-- WIN -->
+<div id="win" class="room hidden">
+    <h2 class="success">🎉 ESCAPED!</h2>
+    <p>You successfully escaped the house!</p>
+    <button onclick="location.reload()">Play Again</button>
+</div>
+
+</div>
+
+<script>
+let inventory = [];
+let foundCode = false;
+let foundKey = false;
+
+function updateInventory(){
+    document.getElementById("items").textContent =
+        inventory.length ? inventory.join(", ") : "Nothing";
+}
+
+function message(text){
+    document.getElementById("message").textContent = text;
+}
+
+function searchBed(){
+    message("You found a note: 'The code is hidden in the desk.'");
+}
+
+function searchDesk(){
+
+    if(foundCode){
+        message("Nothing else here.");
+        return;
+    }
+
+    foundCode = true;
+
+    document.getElementById("lock1").classList.remove("hidden");
+
+    message("You found a paper saying: 314");
+}
+
+function unlockRoom1(){
+
+    const code =
+        document.getElementById("code1").value.trim();
+
+    if(code === "314"){
+        message("Door unlocked!");
+        document.getElementById("room2")
+            .classList.remove("hidden");
+    }
+    else{
+        message("Wrong code.");
+    }
+}
+
+function checkBooks(){
+
+    if(foundKey){
+        message("The bookshelf is empty.");
+        return;
+    }
+
+    message(
+        "One book sticks out. It says: 'Knowledge opens secrets.'"
+    );
+}
+
+function openCabinet(){
+
+    if(foundKey){
+        message("Cabinet already opened.");
+        return;
+    }
+
+    foundKey = true;
+
+    inventory.push("Golden Key");
+
+    updateInventory();
+
+    message(
+        "You opened the cabinet and found a Golden Key!"
+    );
+
+    document.getElementById("room3")
+        .classList.remove("hidden");
+}
+
+function useKey(){
+
+    if(inventory.includes("Golden Key")){
+        document.getElementById("win")
+            .classList.remove("hidden");
+
+        message("The exit door opens!");
+    }
+    else{
+        message("You need a key.");
+    }
+}
+</script>
+
+</body>
+</html>
