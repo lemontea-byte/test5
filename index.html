@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escape Room</title>
+<title>Escape Room Game</title>
 
 <style>
 *{
@@ -25,7 +25,7 @@ h1{
 }
 
 .room{
-    max-width:800px;
+    max-width:850px;
     margin:20px auto;
     background:#222;
     border:2px solid #444;
@@ -35,13 +35,13 @@ h1{
 
 button{
     padding:10px 20px;
-    margin:8px;
+    margin:6px;
     border:none;
     border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
     background:#3498db;
     color:white;
+    cursor:pointer;
+    font-size:16px;
 }
 
 button:hover{
@@ -51,7 +51,7 @@ button:hover{
 input{
     padding:10px;
     font-size:18px;
-    width:150px;
+    width:160px;
     text-align:center;
     margin-top:10px;
 }
@@ -61,18 +61,19 @@ input{
 }
 
 #message{
-    margin:20px auto;
-    max-width:800px;
-    min-height:50px;
+    max-width:850px;
+    margin:auto;
+    margin-bottom:20px;
     background:#333;
-    border-radius:10px;
     padding:15px;
+    border-radius:10px;
+    min-height:60px;
     color:#f1c40f;
     font-weight:bold;
 }
 
 #inventory{
-    max-width:800px;
+    max-width:850px;
     margin:auto;
     background:#333;
     padding:10px;
@@ -81,7 +82,7 @@ input{
 
 .win{
     color:#2ecc71;
-    font-size:30px;
+    font-size:32px;
 }
 </style>
 </head>
@@ -93,162 +94,178 @@ input{
 Inventory: <span id="inventoryItems">Nothing</span>
 </div>
 
+<br>
+
 <div id="message">
 You wake up in a locked house...
 </div>
 
 <!-- ROOM 1 -->
+
 <div id="room1" class="room">
-    <h2>Room 1 - Bedroom</h2>
-    <p>The exit door is locked with a 3-digit code.</p>
+<h2>Room 1 - Bedroom</h2>
 
-    <button onclick="searchBed()">Search Bed</button>
-    <button onclick="searchDesk()">Search Desk</button>
+<p>The exit door is locked with a 3-digit code.</p>
 
-    <div id="keypad" class="hidden">
-        <p><strong>Enter the code:</strong></p>
-        <input id="room1Code" maxlength="3">
-        <br>
-        <button onclick="unlockRoom1()">Unlock Door</button>
-    </div>
+<br>
+
+<button onclick="searchBed()">Search Bed</button>
+<button onclick="searchDesk()">Search Desk</button>
+
+<div id="keypad1" class="hidden">
+<br>
+<p>Enter the code:</p>
+<input id="room1Code">
+<br><br>
+<button onclick="unlockRoom1()">Unlock Door</button>
+</div>
 </div>
 
 <!-- ROOM 2 -->
+
 <div id="room2" class="room hidden">
-    <h2>Room 2 - Library</h2>
+<h2>Room 2 - Library</h2>
 
-    <p>A cabinet sits against the wall.</p>
+<p>The cabinet is locked by a 3-digit combination.</p>
 
-    <button onclick="inspectBooks()">Inspect Bookshelf</button>
-    <button onclick="openCabinet()">Open Cabinet</button>
+<br>
+
+<button onclick="redBook()">Red Book</button>
+<button onclick="greenBook()">Green Book</button>
+<button onclick="blueBook()">Blue Book</button>
+
+<div id="cabinetLock">
+<br>
+<p>Cabinet Combination:</p>
+<input id="cabinetCode">
+<br><br>
+<button onclick="unlockCabinet()">Unlock Cabinet</button>
+</div>
 </div>
 
 <!-- ROOM 3 -->
+
 <div id="room3" class="room hidden">
-    <h2>Room 3 - Exit Hall</h2>
+<h2>Room 3 - Exit Hall</h2>
 
-    <p>A large exit door stands before you.</p>
+<p>A huge exit door stands before you.</p>
 
-    <button onclick="useKey()">Use Golden Key</button>
+<br>
+
+<button onclick="useKey()">Use Golden Key</button>
 </div>
 
 <!-- WIN -->
-<div id="winScreen" class="room hidden">
-    <h2 class="win">🎉 YOU ESCAPED! 🎉</h2>
-    <p>Congratulations! You escaped the house.</p>
 
-    <button onclick="location.reload()">Play Again</button>
+<div id="winScreen" class="room hidden">
+<h2 class="win">🎉 YOU ESCAPED! 🎉</h2>
+
+<p>Congratulations!</p>
+
+<br>
+
+<button onclick="location.reload()">
+Play Again
+</button>
 </div>
 
 <script>
-let inventory = [];
-let foundCode = false;
-let foundKey = false;
 
-function showMessage(text){
-    document.getElementById("message").textContent = text;
+let inventory=[];
+
+function message(text){
+    document.getElementById("message").textContent=text;
 }
 
 function updateInventory(){
-    document.getElementById("inventoryItems").textContent =
-        inventory.length ? inventory.join(", ") : "Nothing";
+    document.getElementById("inventoryItems").textContent=
+    inventory.length ? inventory.join(", ") : "Nothing";
 }
 
+/* ROOM 1 */
+
 function searchBed(){
-    showMessage(
-        "You look under the pillow and find a note: 'The desk hides the answer.'"
-    );
+    message("You find a note: 'The desk hides the answer.'");
 }
 
 function searchDesk(){
+    document.getElementById("keypad1")
+    .classList.remove("hidden");
 
-    if(foundCode){
-        showMessage(
-            "The paper is still here. The code is 314."
-        );
-        return;
-    }
-
-    foundCode = true;
-
-    document.getElementById("keypad")
-        .classList.remove("hidden");
-
-    showMessage(
-        "You open the desk drawer and find a paper with the code: 314"
-    );
+    message("Inside the desk is a paper. The code is 314.");
 }
 
 function unlockRoom1(){
 
-    const code =
-        document.getElementById("room1Code").value.trim();
+    const code=
+    document.getElementById("room1Code").value.trim();
 
-    if(code === "314"){
+    if(code==="314"){
 
         document.getElementById("room2")
-            .classList.remove("hidden");
+        .classList.remove("hidden");
 
-        showMessage(
-            "The bedroom door unlocks! You enter the library."
-        );
+        message("The bedroom door unlocks. You enter the library.");
 
     }else{
 
-        showMessage(
-            "That code doesn't work."
-        );
+        message("Wrong code.");
     }
 }
 
-function inspectBooks(){
+/* ROOM 2 */
 
-    showMessage(
-        "One book reads: 'The cabinet contains what you seek.'"
-    );
+function redBook(){
+    message("The red book says: 'The first number is 7.'");
 }
 
-function openCabinet(){
+function greenBook(){
+    message("The green book says: 'The middle number is 4.'");
+}
 
-    if(foundKey){
-        showMessage(
-            "The cabinet is already open."
-        );
-        return;
-    }
+function blueBook(){
+    message("The blue book says: 'The last number is 2.'");
+}
 
-    foundKey = true;
+function unlockCabinet(){
 
-    inventory.push("Golden Key");
+    const code=
+    document.getElementById("cabinetCode").value.trim();
 
-    updateInventory();
+    if(code==="742"){
 
-    document.getElementById("room3")
+        inventory.push("Golden Key");
+
+        updateInventory();
+
+        document.getElementById("room3")
         .classList.remove("hidden");
 
-    showMessage(
-        "Inside the cabinet you find a Golden Key!"
-    );
+        message("The cabinet opens! Inside is a Golden Key.");
+
+    }else{
+
+        message("The cabinet remains locked.");
+    }
 }
+
+/* ROOM 3 */
 
 function useKey(){
 
     if(inventory.includes("Golden Key")){
 
         document.getElementById("winScreen")
-            .classList.remove("hidden");
+        .classList.remove("hidden");
 
-        showMessage(
-            "The final door swings open!"
-        );
+        message("The final door opens!");
 
     }else{
 
-        showMessage(
-            "You need a key."
-        );
+        message("You need the Golden Key.");
     }
 }
+
 </script>
 
 </body>
