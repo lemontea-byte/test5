@@ -3,49 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Escape Room Game</title>
+<title>Escape Room</title>
 
 <style>
 *{
+    box-sizing:border-box;
     margin:0;
     padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 body{
-    background:#111;
+    background:#121212;
     color:white;
     text-align:center;
     padding:20px;
 }
 
 h1{
-    margin-bottom:15px;
-}
-
-#game{
-    max-width:800px;
-    margin:auto;
+    margin-bottom:20px;
 }
 
 .room{
+    max-width:800px;
+    margin:20px auto;
     background:#222;
-    border:2px solid #555;
+    border:2px solid #444;
     border-radius:15px;
     padding:20px;
-    margin-top:20px;
 }
 
 button{
     padding:10px 20px;
-    margin:5px;
+    margin:8px;
     border:none;
     border-radius:8px;
     cursor:pointer;
+    font-size:16px;
     background:#3498db;
     color:white;
-    font-size:16px;
 }
 
 button:hover{
@@ -54,61 +50,64 @@ button:hover{
 
 input{
     padding:10px;
+    font-size:18px;
     width:150px;
     text-align:center;
-    font-size:18px;
     margin-top:10px;
-}
-
-#message{
-    margin-top:15px;
-    min-height:40px;
-    color:#f1c40f;
-    font-weight:bold;
-}
-
-#inventory{
-    margin-top:15px;
-    padding:10px;
-    background:#333;
-    border-radius:10px;
 }
 
 .hidden{
     display:none;
 }
 
-.success{
+#message{
+    margin:20px auto;
+    max-width:800px;
+    min-height:50px;
+    background:#333;
+    border-radius:10px;
+    padding:15px;
+    color:#f1c40f;
+    font-weight:bold;
+}
+
+#inventory{
+    max-width:800px;
+    margin:auto;
+    background:#333;
+    padding:10px;
+    border-radius:10px;
+}
+
+.win{
     color:#2ecc71;
-    font-size:24px;
+    font-size:30px;
 }
 </style>
 </head>
 <body>
 
-<div id="game">
-
 <h1>🏠 Escape Room</h1>
 
 <div id="inventory">
-    Inventory: <span id="items">Nothing</span>
+Inventory: <span id="inventoryItems">Nothing</span>
 </div>
 
 <div id="message">
-    You wake up in a mysterious house...
+You wake up in a locked house...
 </div>
 
 <!-- ROOM 1 -->
 <div id="room1" class="room">
     <h2>Room 1 - Bedroom</h2>
-    <p>The door is locked.</p>
+    <p>The exit door is locked with a 3-digit code.</p>
 
     <button onclick="searchBed()">Search Bed</button>
     <button onclick="searchDesk()">Search Desk</button>
 
-    <div id="lock1" class="hidden">
-        <p>Enter 3-digit code:</p>
-        <input type="text" id="code1">
+    <div id="keypad" class="hidden">
+        <p><strong>Enter the code:</strong></p>
+        <input id="room1Code" maxlength="3">
         <br>
         <button onclick="unlockRoom1()">Unlock Door</button>
     </div>
@@ -117,9 +116,10 @@ input{
 <!-- ROOM 2 -->
 <div id="room2" class="room hidden">
     <h2>Room 2 - Library</h2>
-    <p>A locked cabinet stands in the corner.</p>
 
-    <button onclick="checkBooks()">Inspect Bookshelf</button>
+    <p>A cabinet sits against the wall.</p>
+
+    <button onclick="inspectBooks()">Inspect Bookshelf</button>
     <button onclick="openCabinet()">Open Cabinet</button>
 </div>
 
@@ -127,18 +127,17 @@ input{
 <div id="room3" class="room hidden">
     <h2>Room 3 - Exit Hall</h2>
 
-    <p>The final exit door requires a key.</p>
+    <p>A large exit door stands before you.</p>
 
-    <button onclick="useKey()">Use Key</button>
+    <button onclick="useKey()">Use Golden Key</button>
 </div>
 
 <!-- WIN -->
-<div id="win" class="room hidden">
-    <h2 class="success">🎉 ESCAPED!</h2>
-    <p>You successfully escaped the house!</p>
-    <button onclick="location.reload()">Play Again</button>
-</div>
+<div id="winScreen" class="room hidden">
+    <h2 class="win">🎉 YOU ESCAPED! 🎉</h2>
+    <p>Congratulations! You escaped the house.</p>
 
+    <button onclick="location.reload()">Play Again</button>
 </div>
 
 <script>
@@ -146,64 +145,75 @@ let inventory = [];
 let foundCode = false;
 let foundKey = false;
 
-function updateInventory(){
-    document.getElementById("items").textContent =
-        inventory.length ? inventory.join(", ") : "Nothing";
-}
-
-function message(text){
+function showMessage(text){
     document.getElementById("message").textContent = text;
 }
 
+function updateInventory(){
+    document.getElementById("inventoryItems").textContent =
+        inventory.length ? inventory.join(", ") : "Nothing";
+}
+
 function searchBed(){
-    message("You found a note: 'The code is hidden in the desk.'");
+    showMessage(
+        "You look under the pillow and find a note: 'The desk hides the answer.'"
+    );
 }
 
 function searchDesk(){
 
     if(foundCode){
-        message("Nothing else here.");
+        showMessage(
+            "The paper is still here. The code is 314."
+        );
         return;
     }
 
     foundCode = true;
 
-    document.getElementById("lock1").classList.remove("hidden");
+    document.getElementById("keypad")
+        .classList.remove("hidden");
 
-    message("You found a paper saying: 314");
+    showMessage(
+        "You open the desk drawer and find a paper with the code: 314"
+    );
 }
 
 function unlockRoom1(){
 
     const code =
-        document.getElementById("code1").value.trim();
+        document.getElementById("room1Code").value.trim();
 
     if(code === "314"){
-        message("Door unlocked!");
+
         document.getElementById("room2")
             .classList.remove("hidden");
-    }
-    else{
-        message("Wrong code.");
+
+        showMessage(
+            "The bedroom door unlocks! You enter the library."
+        );
+
+    }else{
+
+        showMessage(
+            "That code doesn't work."
+        );
     }
 }
 
-function checkBooks(){
+function inspectBooks(){
 
-    if(foundKey){
-        message("The bookshelf is empty.");
-        return;
-    }
-
-    message(
-        "One book sticks out. It says: 'Knowledge opens secrets.'"
+    showMessage(
+        "One book reads: 'The cabinet contains what you seek.'"
     );
 }
 
 function openCabinet(){
 
     if(foundKey){
-        message("Cabinet already opened.");
+        showMessage(
+            "The cabinet is already open."
+        );
         return;
     }
 
@@ -213,24 +223,30 @@ function openCabinet(){
 
     updateInventory();
 
-    message(
-        "You opened the cabinet and found a Golden Key!"
-    );
-
     document.getElementById("room3")
         .classList.remove("hidden");
+
+    showMessage(
+        "Inside the cabinet you find a Golden Key!"
+    );
 }
 
 function useKey(){
 
     if(inventory.includes("Golden Key")){
-        document.getElementById("win")
+
+        document.getElementById("winScreen")
             .classList.remove("hidden");
 
-        message("The exit door opens!");
-    }
-    else{
-        message("You need a key.");
+        showMessage(
+            "The final door swings open!"
+        );
+
+    }else{
+
+        showMessage(
+            "You need a key."
+        );
     }
 }
 </script>
